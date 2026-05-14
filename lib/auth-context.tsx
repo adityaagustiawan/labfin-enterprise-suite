@@ -14,8 +14,6 @@ interface UserProfile {
 interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
-  login: (email: string, name?: string, picture?: string) => void;
-  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,26 +34,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (email: string, name?: string, picture?: string) => {
-    // Basic logic: if email has a common business domain (or just not gmail/yahoo/outlook for demo)
-    // For this demo, let's say if it contains a dot in the domain part that isn't a common free one
-    const freeDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
-    const domain = email.split("@")[1]?.toLowerCase();
-    // For Demo Version, everyone is treated as company to unlock all features
-    const type: UserType = "company";
-
-    const profile: UserProfile = { email, name, picture, type };
-    setUser(profile);
-    localStorage.setItem("lablens_auth", JSON.stringify(profile));
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("lablens_auth");
-  };
-
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

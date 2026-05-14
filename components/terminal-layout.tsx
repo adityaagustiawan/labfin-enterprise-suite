@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { useAuth } from "@/lib/auth-context";
-import { LoginPage } from "./login-page";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
@@ -18,11 +17,9 @@ const nav = [
 export function TerminalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading } = useAuth();
 
-  if (isLoading) return <div className="min-h-dvh bg-[#070b10]" />;
-  // Sign-in page bypassed for public demo
-  // if (!user) return <LoginPage />;
+  if (isLoading || !user) return <div className="min-h-dvh bg-[#070b10]" />;
 
   return (
     <div className="flex min-h-dvh bg-[var(--color-surface)] text-zinc-100">
@@ -61,6 +58,7 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+
         <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-subtle)] bg-zinc-950/50 p-3">
           <div className="flex items-center gap-3">
             {user.picture ? (
@@ -79,15 +77,6 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
             </div>
-            <button 
-              onClick={logout}
-              className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200 transition-colors"
-              title="Logout"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-            </button>
           </div>
         </div>
       </aside>
