@@ -6,6 +6,9 @@ import { useState } from "react";
 
 import { useAuth } from "@/lib/auth-context";
 
+import { motion, AnimatePresence } from "framer-motion";
+import { Activity, Signal, Zap } from "lucide-react";
+
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
   { href: "/analyze", label: "New analysis", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
@@ -46,28 +49,67 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
+                className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
                   active ? "bg-sky-600/20 text-sky-100 ring-1 ring-sky-500/30" : "text-zinc-300 hover:bg-zinc-800/80"
                 }`}
               >
-                <svg className={`h-4 w-4 shrink-0 ${active ? "text-sky-400" : "text-zinc-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${active ? "text-sky-400" : "text-zinc-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                 </svg>
                 {item.label}
+                {active && (
+                  <motion.div
+                    layoutId="nav-active"
+                    className="absolute inset-0 rounded-lg bg-sky-500/10 -z-10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-subtle)] bg-zinc-950/50 p-3">
+        <div className="mt-auto px-4 py-6">
+          <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 flex items-center gap-1.5">
+                <Signal size={10} className="text-emerald-500 animate-pulse" /> Market Pulse
+              </span>
+              <span className="text-[10px] font-mono text-emerald-500">LIVE</span>
+            </div>
+            <div className="space-y-3">
+              {[
+                { label: "S&P 500", value: "5,241.53", delta: "+0.12%", icon: Activity },
+                { label: "NASDAQ", value: "16,384.47", delta: "+0.34%", icon: Zap },
+              ].map((m, i) => (
+                <div key={i} className="flex items-center justify-between group cursor-default">
+                  <div>
+                    <p className="text-[11px] font-medium text-zinc-300 group-hover:text-white transition-colors">{m.label}</p>
+                    <p className="text-[10px] font-mono text-zinc-500">{m.value}</p>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-500">{m.delta}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0 border-t border-[var(--color-border-subtle)] bg-zinc-950/50 p-3 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            {user.picture ? (
-              <img src={user.picture} alt="" className="h-8 w-8 rounded-lg object-contain bg-white p-1" />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-zinc-400">
-                {user.email.substring(0, 2).toUpperCase()}
-              </div>
-            )}
+            <div className="relative group">
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute -inset-1 rounded-lg bg-gradient-to-tr from-sky-500 to-emerald-500 opacity-20 group-hover:opacity-40 transition-opacity blur"
+              />
+              {user.picture ? (
+                <img src={user.picture} alt="" className="relative h-8 w-8 rounded-lg object-contain bg-white p-1 shadow-2xl" />
+              ) : (
+                <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-[10px] font-bold text-zinc-400">
+                  {user.email.substring(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[11px] font-medium text-zinc-200">Public Demo</p>
               <div className="flex items-center gap-1">

@@ -12,6 +12,9 @@ import type {
   IncomeStatement,
 } from "@/lib/types";
 
+import { NewsletterPanel } from "./newsletter-panel";
+import { generateNewsletter, NewsletterReport } from "@/lib/analyst-agent";
+
 type Tab = "manual" | "ticker" | "compare" | "ai";
 
 const defaultManual: CompanyFinancials = {
@@ -76,6 +79,7 @@ export default function AnalyzeWorkspace() {
   const [compareA, setCompareA] = useState("AAPL");
   const [compareB, setCompareB] = useState("MSFT");
   const [analysis, setAnalysis] = useState<FullAnalysis | null>(null);
+  const [newsletter, setNewsletter] = useState<NewsletterReport | null>(null);
   const [comparePair, setComparePair] = useState<{ a: FullAnalysis; b: FullAnalysis } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -143,6 +147,9 @@ export default function AnalyzeWorkspace() {
           const analysisResult = await postAnalyze(nextFinancials);
           setAnalysis(analysisResult);
           setTab("manual"); // Switch to manual tab to show the filled data
+          
+          // Generate advanced newsletter in background
+          generateNewsletter(analysisResult).then(setNewsletter).catch(console.error);
         } catch {
           setError("AI extracted data but the financial engine failed to process it. Please check the Manual tab.");
         }
@@ -238,11 +245,14 @@ export default function AnalyzeWorkspace() {
       const local = runFullAnalysis(manual);
       if (!local.validation.isValid) {
         setAnalysis(null);
+        setNewsletter(null);
         setError(local.validation.issues.filter((i) => i.severity === "error").map((i) => i.message).join(" · "));
         return;
       }
       const result = await postAnalyze(manual);
       setAnalysis(result);
+      // Generate advanced newsletter in background
+      generateNewsletter(result).then(setNewsletter).catch(console.error);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
@@ -733,7 +743,8 @@ export default function AnalyzeWorkspace() {
       )}
 
       {analysis && (
-        <div className="pb-10">
+        <div className="space-y-6 pb-10">
+          {newsletter && <NewsletterPanel report={newsletter} />}
           <AnalysisDashboard analysis={analysis} showAnalystChat />
         </div>
       )}

@@ -36,6 +36,7 @@ export const viewport: Viewport = {
 };
 
 import { AuthProvider } from "@/lib/auth-context";
+import { PageAnimatePresence } from "@/components/page-animate-presence";
 
 export default function RootLayout({
   children,
@@ -44,9 +45,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="font-sans">
+      <body className="font-sans antialiased selection:bg-sky-500/30">
         <AuthProvider>
-          {children}
+          <PageAnimatePresence>
+            {children}
+          </PageAnimatePresence>
         </AuthProvider>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </body>

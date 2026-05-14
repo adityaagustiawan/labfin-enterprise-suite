@@ -8,6 +8,9 @@ import { InsightPanel } from "./insight-panel";
 import { KpiGrid } from "./kpi-grid";
 import { RiskPanel } from "./risk-panel";
 
+import { motion } from "framer-motion";
+import { Zap } from "lucide-react";
+
 const ChartSummary = dynamic(() => import("./chart-summary").then((m) => m.ChartSummary), {
   ssr: false,
   loading: () => (
@@ -46,10 +49,19 @@ export function AnalysisDashboard({
   const trendsVisible = (showTrendCharts ?? true) && history.length > 0;
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="space-y-4 sm:space-y-6"
+    >
       {!omitHeader && (
-      <header className="rounded-2xl border border-[var(--color-border-subtle)] bg-gradient-to-br from-[#0f172a] to-[var(--color-surface-elevated)] p-4 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <header className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#0f172a]/90 to-[#0a0f14]/90 p-4 sm:p-6 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+        <div className="absolute inset-0 bg-grid-white/[0.02] -z-10" />
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Zap size={120} className="text-sky-500" />
+        </div>
+        
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between relative z-10">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-300/90">
               FinLab AI · Enterprise run
@@ -114,20 +126,60 @@ export function AnalysisDashboard({
       </header>
       )}
 
-      <KpiGrid ratios={analysis.ratios} />
-
-      {trendsVisible && <CompanyTrendCharts history={history} />}
-
-      <div className="grid gap-4 lg:grid-cols-5 lg:gap-5">
-        <div className="space-y-4 lg:col-span-3">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="lg:col-span-2"
+        >
           <ChartSummary analysis={analysis} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
           <RiskPanel analysis={analysis} />
-        </div>
-        <div className="space-y-4 lg:col-span-2">
-          <InsightPanel analysis={analysis} />
-          {showAnalystChat && <AnalystChat analysis={analysis} />}
-        </div>
+        </motion.div>
       </div>
-    </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <KpiGrid ratios={analysis.ratios} />
+      </motion.div>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <InsightPanel analysis={analysis} />
+        </motion.div>
+        {showAnalystChat && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <AnalystChat analysis={analysis} />
+          </motion.div>
+        )}
+      </div>
+
+      {trendsVisible && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <CompanyTrendCharts history={history} />
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
