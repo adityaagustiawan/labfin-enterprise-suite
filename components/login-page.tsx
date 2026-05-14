@@ -32,7 +32,7 @@ export function LoginPage() {
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-emerald-400 text-xl font-bold text-slate-950">
             FL
           </span>
-          <h2 className="mt-6 text-2xl font-bold tracking-tight text-white">Sign in to FinLab AI</h2>
+          <h2 className="mt-6 text-2xl font-bold tracking-tight text-white">Sign in to FinLab</h2>
           <p className="mt-2 text-sm text-zinc-400">Enter your business email for full AI access</p>
         </div>
 

@@ -65,8 +65,8 @@ export default function CompanyDetailClient({ ticker }: { ticker: string }) {
         <>
           <div className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-emerald-300/90">
-                Live · LabLens Terminal v1
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-sky-300/90">
+                FinLab AI · Enterprise run
               </p>
               <h1 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">
                 {analysis.financials.company_name}

@@ -18,6 +18,7 @@ export function MarketingVideoBackdrop() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const queueRef = useRef<string[]>([]);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [videoFailed, setVideoFailed] = useState(false);
   const [queue, setQueue] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -29,14 +30,25 @@ export function MarketingVideoBackdrop() {
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileMq = window.matchMedia("(max-width: 768px)");
+    
     setReduceMotion(mq.matches);
-    const onChange = () => setReduceMotion(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+    setIsMobile(mobileMq.matches);
+
+    const onMotionChange = () => setReduceMotion(mq.matches);
+    const onMobileChange = () => setIsMobile(mobileMq.matches);
+
+    mq.addEventListener("change", onMotionChange);
+    mobileMq.addEventListener("change", onMobileChange);
+
+    return () => {
+      mq.removeEventListener("change", onMotionChange);
+      mobileMq.removeEventListener("change", onMobileChange);
+    };
   }, []);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || isMobile) return;
     if (envSrc) {
       setQueue([envSrc]);
     } else {
@@ -44,7 +56,7 @@ export function MarketingVideoBackdrop() {
     }
     setActiveIndex(0);
     setVideoFailed(false);
-  }, [envSrc, reduceMotion]);
+  }, [envSrc, reduceMotion, isMobile]);
 
   queueRef.current = queue;
   const src = queue[activeIndex] ?? null;
@@ -82,21 +94,29 @@ export function MarketingVideoBackdrop() {
     });
   }, [usePlaylistAdvance]);
 
-  if (reduceMotion || videoFailed || !src) {
-    return (
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,#1e3a5f_0%,#0a0f14_45%,#05080c_100%)]"
-      />
-    );
+  const backdropBase = (
+    <div
+      aria-hidden
+      className="fixed inset-0 z-0 bg-[#05080c]"
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,#1e3a5f_0%,#0a0f14_45%,#05080c_100%)] opacity-80" />
+      <div className="absolute inset-0 animate-pulse bg-[radial-gradient(circle_at_20%_30%,#0c4a6e_0%,transparent_50%)] opacity-20" />
+      <div className="absolute inset-0 animate-pulse delay-700 bg-[radial-gradient(circle_at_80%_70%,#065f46_0%,transparent_50%)] opacity-10" />
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] mix-blend-overlay" />
+    </div>
+  );
+
+  if (reduceMotion || isMobile || videoFailed || !src) {
+    return backdropBase;
   }
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {backdropBase}
       <video
         key={`${activeIndex}-${src}`}
         ref={videoRef}
-        className="absolute left-1/2 top-1/2 min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-55"
+        className="absolute left-1/2 top-1/2 min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover opacity-30 mix-blend-screen"
         src={src}
         autoPlay
         muted
@@ -107,9 +127,7 @@ export function MarketingVideoBackdrop() {
         onError={onVideoError}
         onEnded={usePlaylistAdvance ? onEnded : undefined}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f14]/80 via-[#0a0f14]/88 to-[#05080c]/95" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_50%_0%,rgba(56,189,248,0.12),transparent_55%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#0a0f14_78%)] opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#05080c] via-transparent to-transparent opacity-60" />
     </div>
   );
 }

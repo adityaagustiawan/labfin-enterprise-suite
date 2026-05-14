@@ -12,13 +12,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-[var(--color-border-subtle)] bg-[var(--color-surface)]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-3 sm:px-4 lg:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-emerald-400 text-sm font-bold text-slate-950">
-              LL
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-emerald-400 text-xs font-bold text-slate-950">
+              FL
             </span>
-            <div className="leading-tight">
-              <p className="text-sm font-semibold tracking-tight sm:text-base">LabLens IQ</p>
-              <p className="text-[10px] text-zinc-500 sm:text-xs">lab-lab.ai · enterprise AI finance</p>
-            </div>
+            <p className="text-sm font-semibold text-white">FinLab AI</p>
           </Link>
           <nav className="hidden items-center gap-4 text-sm text-zinc-400 sm:flex">
             <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-[11px] text-zinc-300">

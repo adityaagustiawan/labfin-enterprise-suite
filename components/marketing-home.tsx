@@ -50,7 +50,7 @@ export default function MarketingHome() {
               Institutional-grade financial analysis in seconds.
             </h1>
             <p className="mx-auto max-w-2xl text-pretty text-sm leading-relaxed text-zinc-300 sm:mx-0 sm:text-lg">
-              LabLens IQ ingests structured statements, validates anomalies, computes ratios, and cross-checks a
+              FinLab AI ingests structured statements, validates anomalies, computes ratios, and cross-checks a
               transparent rules engine — similar in spirit to public demos like{" "}
               <a className="text-sky-400 underline-offset-2 hover:underline" href="https://finscope-xai.lovable.app/">
                 FinScope
@@ -139,8 +139,7 @@ export default function MarketingHome() {
         </main>
 
         <footer className="border-t border-white/10 bg-[#0a0f14]/70 py-6 text-center text-xs text-zinc-500 backdrop-blur-md">
-          LabLens IQ — not investment advice. External reference repos (e.g. labfin-enterprise-suite) can be wired in when
-          available.
+          FinLab AI — not investment advice. Enterprise-ready financial intelligence.
         </footer>
       </div>
     </div>
