@@ -4,7 +4,13 @@ import { useMemo, useState } from "react";
 import { AnalysisDashboard } from "@/components/analysis-dashboard";
 import { runFullAnalysis } from "@/lib/analyze";
 import { DEMO_TICKERS, loadDemoTicker } from "@/lib/demo-tickers";
-import type { CompanyFinancials, FullAnalysis } from "@/lib/types";
+import type {
+  BalanceSheet,
+  CashFlow,
+  CompanyFinancials,
+  FullAnalysis,
+  IncomeStatement,
+} from "@/lib/types";
 
 type Tab = "manual" | "ticker" | "compare" | "ai";
 
@@ -137,8 +143,7 @@ export default function AnalyzeWorkspace() {
           const analysisResult = await postAnalyze(nextFinancials);
           setAnalysis(analysisResult);
           setTab("manual"); // Switch to manual tab to show the filled data
-        } catch (err) {
-          console.error("Auto-analysis failed:", err);
+        } catch {
           setError("AI extracted data but the financial engine failed to process it. Please check the Manual tab.");
         }
       } else {
@@ -146,7 +151,7 @@ export default function AnalyzeWorkspace() {
         try {
           const analysisResult = await postAnalyze(manual);
           setAnalysis(analysisResult);
-        } catch (err) {
+        } catch {
           setError("AI couldn't extract financial data from this media.");
         }
       }
@@ -178,14 +183,15 @@ export default function AnalyzeWorkspace() {
   function applyAIData() {
     if (!aiResult?.extractedData) return;
 
-    const mergeFinancials = (prev: any, next: any) => {
+    const mergeFinancials = <T extends object>(prev: T, next?: Partial<T>): T => {
       if (!next) return prev;
       const result = { ...prev };
-      for (const key in next) {
-        if (next[key] !== 0 && next[key] !== null && next[key] !== undefined) {
-          result[key] = next[key];
+      (Object.keys(next) as Array<keyof T>).forEach((key) => {
+        const val = next[key];
+        if (val !== 0 && val !== null && val !== undefined) {
+          result[key] = val as T[keyof T];
         }
-      }
+      });
       return result;
     };
 
@@ -195,9 +201,18 @@ export default function AnalyzeWorkspace() {
       ticker: aiResult.extractedData?.ticker || prev.ticker,
       sector: aiResult.extractedData?.sector || prev.sector,
       year: aiResult.extractedData?.year || prev.year,
-      income_statement: mergeFinancials(prev.income_statement, aiResult.extractedData?.income_statement),
-      balance_sheet: mergeFinancials(prev.balance_sheet, aiResult.extractedData?.balance_sheet),
-      cash_flow: mergeFinancials(prev.cash_flow, aiResult.extractedData?.cash_flow),
+      income_statement: mergeFinancials(
+        prev.income_statement,
+        aiResult.extractedData?.income_statement as Partial<IncomeStatement>,
+      ),
+      balance_sheet: mergeFinancials(
+        prev.balance_sheet,
+        aiResult.extractedData?.balance_sheet as Partial<BalanceSheet>,
+      ),
+      cash_flow: mergeFinancials(
+        prev.cash_flow,
+        aiResult.extractedData?.cash_flow as Partial<CashFlow>,
+      ),
     }));
     setTab("manual");
   }

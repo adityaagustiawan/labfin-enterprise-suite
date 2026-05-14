@@ -26,7 +26,7 @@ export function AnalystChat({ analysis }: { analysis: FullAnalysis }) {
     try {
       const answer = await analystReply(question, analysis);
       setMessages((m) => [...m, { role: "analyst", text: answer }]);
-    } catch (error) {
+    } catch {
       setMessages((m) => [...m, { role: "analyst", text: "Error connecting to AI analyst." }]);
     } finally {
       setLoading(false);
