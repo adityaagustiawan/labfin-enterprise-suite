@@ -25,3 +25,9 @@ npm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Large Media
+/public/marketing/*.mp4
+/qa-assets/*.pdf
+/qa-assets/*.png
+/qa-assets/*.wav
