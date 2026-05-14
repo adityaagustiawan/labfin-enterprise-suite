@@ -25,10 +25,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem("lablens_auth");
-    if (saved) {
-      setUser(JSON.parse(saved));
-    }
+    // For the Public Demo version, we auto-login a demo user immediately
+    const demoUser: UserProfile = {
+      email: "demo@finlab.ai",
+      name: "Demo User",
+      picture: "https://logo.clearbit.com/apple.com",
+      type: "company"
+    };
+    setUser(demoUser);
     setIsLoading(false);
   }, []);
 

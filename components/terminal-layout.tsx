@@ -21,7 +21,8 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading, logout } = useAuth();
 
   if (isLoading) return <div className="min-h-dvh bg-[#070b10]" />;
-  if (!user) return <LoginPage />;
+  // Sign-in page bypassed for public demo
+  // if (!user) return <LoginPage />;
 
   return (
     <div className="flex min-h-dvh bg-[var(--color-surface)] text-zinc-100">
@@ -70,11 +71,11 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[11px] font-medium text-zinc-200">{user.name || user.email}</p>
+              <p className="truncate text-[11px] font-medium text-zinc-200">Public Demo</p>
               <div className="flex items-center gap-1">
                 <span className="h-1 w-1 rounded-full bg-emerald-500" />
                 <p className="truncate text-[9px] uppercase tracking-wider text-zinc-500">
-                  Demo Version
+                  Full Access
                 </p>
               </div>
             </div>
