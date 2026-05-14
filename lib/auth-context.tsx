@@ -37,7 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // For this demo, let's say if it contains a dot in the domain part that isn't a common free one
     const freeDomains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com"];
     const domain = email.split("@")[1]?.toLowerCase();
-    const type: UserType = freeDomains.includes(domain) ? "free" : "company";
+    // For Demo Version, everyone is treated as company to unlock all features
+    const type: UserType = "company";
 
     const profile: UserProfile = { email, name, picture, type };
     setUser(profile);

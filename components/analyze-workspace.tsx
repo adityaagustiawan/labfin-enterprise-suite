@@ -639,7 +639,7 @@ export default function AnalyzeWorkspace() {
                 type="file"
                 id="ai-upload"
                 className="hidden"
-                accept="video/*,audio/*,image/*"
+                accept="video/*,image/*"
                 onChange={(e) => setAiFile(e.target.files?.[0] || null)}
               />
               <label

@@ -72,9 +72,9 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-[11px] font-medium text-zinc-200">{user.name || user.email}</p>
               <div className="flex items-center gap-1">
-                <span className={`h-1 w-1 rounded-full ${user.type === 'company' ? 'bg-emerald-500' : 'bg-sky-500'}`} />
+                <span className="h-1 w-1 rounded-full bg-emerald-500" />
                 <p className="truncate text-[9px] uppercase tracking-wider text-zinc-500">
-                  {user.type === 'company' ? 'Enterprise' : 'Free Tier'}
+                  Demo Version
                 </p>
               </div>
             </div>

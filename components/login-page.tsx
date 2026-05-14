@@ -32,14 +32,14 @@ export function LoginPage() {
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-emerald-400 text-xl font-bold text-slate-950">
             FL
           </span>
-          <h2 className="mt-6 text-2xl font-bold tracking-tight text-white">Sign in to FinLab</h2>
-          <p className="mt-2 text-sm text-zinc-400">Enter your business email for full AI access</p>
+          <h2 className="mt-6 text-2xl font-bold tracking-tight text-white">Sign in to FinLab AI</h2>
+          <p className="mt-2 text-sm text-zinc-400">Demo Version: All features unlocked</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleEmailLogin}>
           <div className="space-y-1">
             <label htmlFor="email" className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-              Business Email
+              Email Address
             </label>
             <input
               id="email"
@@ -47,7 +47,7 @@ export function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@company.com"
+              placeholder="name@example.com"
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-sm text-white outline-none focus:border-sky-500/60 focus:ring-2 focus:ring-sky-500/30"
             />
           </div>
@@ -65,7 +65,7 @@ export function LoginPage() {
             <div className="w-full border-t border-white/10"></div>
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-[#0a0f14] px-2 text-zinc-500 tracking-widest">Or test free version</span>
+            <span className="bg-[#0a0f14] px-2 text-zinc-500 tracking-widest">Or try instantly</span>
           </div>
         </div>
 

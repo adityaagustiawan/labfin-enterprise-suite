@@ -15,7 +15,6 @@ export function AnalystChat({ analysis }: { analysis: FullAnalysis }) {
   const [loading, setLoading] = useState(false);
 
   async function send(text?: string) {
-    if (user?.type !== "company") return;
     const question = (text ?? q).trim();
     if (!question) return;
     
@@ -33,29 +32,10 @@ export function AnalystChat({ analysis }: { analysis: FullAnalysis }) {
     }
   }
 
-  const isLocked = user?.type !== "company";
+  const isLocked = false; // Always unlocked for demo
 
   return (
-    <section className={`rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] p-4 sm:p-5 relative overflow-hidden ${isLocked ? "opacity-75" : ""}`}>
-      {isLocked && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#070b10]/60 backdrop-blur-[2px] p-6 text-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-500/20 text-amber-500 ring-1 ring-amber-500/40">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-          <h4 className="text-sm font-bold text-white">Enterprise Feature</h4>
-          <p className="mt-1 text-[11px] leading-relaxed text-zinc-300">
-            AI Analyst Chat is restricted to Enterprise users. Please sign in with a company email to unlock.
-          </p>
-          <button 
-            disabled
-            className="mt-4 rounded-lg bg-zinc-800 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 border border-white/5"
-          >
-            Locked
-          </button>
-        </div>
-      )}
+    <section className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] p-4 sm:p-5 relative overflow-hidden">
       <h3 className="text-sm font-semibold text-zinc-100 sm:text-base">Ask the AI analyst</h3>
       <p className="mt-1 text-xs text-zinc-500">
         Grounded on the active statement pack — swap <code className="font-mono text-[10px]">analystReply</code> for your

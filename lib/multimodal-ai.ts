@@ -29,7 +29,7 @@ export async function analyzeMultimodalMedia(
 
     const prompt = `
       You are a specialized financial analyst and researcher. 
-      Analyze the provided media (video, image, audio, or document).
+      Analyze the provided media (video, image, or document).
       
       Your goal is to provide a comprehensive summary and extract any possible financial or business data.
       
