@@ -1,10 +1,15 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText } from 'ai';
+import { hasApiKey } from '@/lib/gemini-handler';
 
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
+
+  if (!hasApiKey()) {
+    return new Response("API Key missing", { status: 500 });
+  }
 
   const google = createGoogleGenerativeAI({
     apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY_2 || process.env.GOOGLE_GENERATIVE_AI_API_KEY,

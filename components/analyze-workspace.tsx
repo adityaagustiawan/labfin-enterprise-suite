@@ -314,10 +314,10 @@ export default function AnalyzeWorkspace() {
               key={t.id}
               type="button"
               onClick={() => setTab(t.id)}
-              className={`rounded-full px-2.5 py-1.5 text-[11px] font-medium transition sm:px-3 sm:text-sm ${
+              className={`relative flex-1 rounded-xl py-2.5 text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
                 tab === t.id
-                  ? "bg-sky-600 text-white shadow-lg shadow-sky-900/40"
-                  : "bg-zinc-800/80 text-zinc-300 hover:bg-zinc-800"
+                  ? "bg-sky-600 text-white shadow-lg shadow-sky-600/20"
+                  : "text-zinc-500 hover:bg-white/5 hover:text-zinc-300"
               }`}
             >
               {t.label}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import yahooFinance from "yahoo-finance2";
 import { runMultiAgentAnalysis } from "@/lib/multi-agent-engine";
+import { hasApiKey } from "@/lib/gemini-handler";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ticker is required" }, { status: 400 });
     }
 
-    if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    if (!hasApiKey()) {
       console.error("[Multi-Agent API] MISSING API KEY");
       return NextResponse.json({ error: "Server Configuration Error: Gemini API Key missing" }, { status: 500 });
     }

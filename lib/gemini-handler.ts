@@ -5,6 +5,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  */
 export const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY_2 || "");
 
+export function hasApiKey(): boolean {
+  return !!(process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY_2);
+}
+
 export function isGeminiBlocked(error: unknown): boolean {
   const errorMsg = error instanceof Error ? error.message : String(error);
   return errorMsg.includes("403") || errorMsg.includes("API_KEY_SERVICE_BLOCKED") || errorMsg.includes("blocked");

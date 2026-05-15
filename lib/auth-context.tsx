@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const demoUser: UserProfile = {
       email: "demo@finlab.ai",
       name: "Demo User",
-      picture: "https://logo.clearbit.com/apple.com",
+      picture: "https://api.dicebear.com/7.x/bottts/svg?seed=FinLab",
       type: "company"
     };
     setUser(demoUser);

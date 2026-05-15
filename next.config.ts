@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  turbopack: {
+    resolveAlias: {
+      'zod/v3': 'zod',
+    },
+  },
 };
 
 export default nextConfig;

@@ -1,4 +1,4 @@
-import { genAI, handleGeminiError, isGeminiBlocked } from "./gemini-handler";
+import { genAI, handleGeminiError, isGeminiBlocked, hasApiKey } from "./gemini-handler";
 
 export interface AgentResponse {
   agentName: string;
@@ -18,7 +18,7 @@ export interface MultiAgentResult {
  * Orchestrates multiple specialized agents to provide a comprehensive market view.
  */
 export async function runMultiAgentAnalysis(query: string, contextData?: Record<string, unknown> | null): Promise<MultiAgentResult> {
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  if (!hasApiKey()) {
     throw new Error("Gemini API Key missing");
   }
 

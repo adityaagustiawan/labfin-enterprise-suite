@@ -26,22 +26,22 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-dvh bg-[var(--color-surface)] text-zinc-100">
+      {/* Sidebar */}
       <aside
         id="terminal-sidebar"
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform border-r border-[var(--color-border-subtle)] bg-[#070b10] transition-transform duration-200 ease-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-white/5 bg-[#0a0f14] transition-transform duration-200 ease-out lg:static lg:translate-x-0 ${
           open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex h-14 items-center gap-2 border-b border-[var(--color-border-subtle)] px-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-emerald-400 text-sm font-bold text-slate-950">
-            FL
-          </span>
-          <div>
-            <p className="text-sm font-semibold">FinLab AI</p>
-            <p className="text-[10px] text-zinc-500">Terminal</p>
-          </div>
+        <div className="flex h-16 items-center px-6 border-b border-white/5 bg-zinc-900/20">
+          <Link href="/dashboard" className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 shadow-lg shadow-sky-600/20">
+              <Zap size={18} className="text-white" fill="white" />
+            </div>
+            <span className="text-sm font-bold tracking-tight text-white uppercase">LabLens IQ</span>
+          </Link>
         </div>
-        <nav className="space-y-0.5 p-3">
+        <nav className="flex-1 space-y-1 px-3 py-4">
           {nav.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
@@ -49,21 +49,16 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                  active ? "bg-sky-600/20 text-sky-100 ring-1 ring-sky-500/30" : "text-zinc-300 hover:bg-zinc-800/80"
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  active
+                    ? "bg-sky-500/10 text-sky-400 shadow-[inset_0_0_10px_rgba(56,189,248,0.05)] border border-sky-500/20"
+                    : "text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200"
                 }`}
               >
-                <svg className={`h-4 w-4 shrink-0 transition-transform group-hover:scale-110 ${active ? "text-sky-400" : "text-zinc-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className={`h-[18px] w-[18px] shrink-0 ${active ? "text-sky-400" : "text-zinc-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                 </svg>
                 {item.label}
-                {active && (
-                  <motion.div
-                    layoutId="nav-active"
-                    className="absolute inset-0 rounded-lg bg-sky-500/10 -z-10"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
               </Link>
             );
           })}
@@ -103,7 +98,19 @@ export function TerminalLayout({ children }: { children: React.ReactNode }) {
                 className="absolute -inset-1 rounded-lg bg-gradient-to-tr from-sky-500 to-emerald-500 opacity-20 group-hover:opacity-40 transition-opacity blur"
               />
               {user.picture ? (
-                <img src={user.picture} alt="" className="relative h-8 w-8 rounded-lg object-contain bg-white p-1 shadow-2xl" />
+                <img 
+                  src={user.picture} 
+                  alt="" 
+                  className="relative h-8 w-8 rounded-lg object-contain bg-white p-1 shadow-2xl" 
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    (e.target as HTMLImageElement).parentElement?.classList.add('flex', 'items-center', 'justify-center', 'bg-zinc-800');
+                    const fallback = document.createElement('div');
+                    fallback.className = 'relative flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-[10px] font-bold text-zinc-400';
+                    fallback.innerText = user.email.substring(0, 2).toUpperCase();
+                    (e.target as HTMLImageElement).parentElement?.appendChild(fallback);
+                  }}
+                />
               ) : (
                 <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-[10px] font-bold text-zinc-400">
                   {user.email.substring(0, 2).toUpperCase()}

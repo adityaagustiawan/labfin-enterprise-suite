@@ -1,4 +1,4 @@
-import { genAI, handleGeminiError, isGeminiBlocked } from "./gemini-handler";
+import { genAI, handleGeminiError, isGeminiBlocked, hasApiKey } from "./gemini-handler";
 import type { FullAnalysis } from "./types";
 
 export interface NewsletterReport {
@@ -18,7 +18,7 @@ export async function generateNewsletter(a: FullAnalysis): Promise<NewsletterRep
   const { financials, ratios, insights, decision } = a;
   const t = financials.ticker ?? financials.company_name;
 
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  if (!hasApiKey()) {
     throw new Error("API Key missing");
   }
 
@@ -91,7 +91,7 @@ export async function analystReply(question: string, a: FullAnalysis): Promise<s
   const { financials, ratios, insights, decision, riskScores, benchmarkDeltas } = a;
   const t = financials.ticker ?? financials.company_name;
 
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  if (!hasApiKey()) {
     return "AI Analyst is not configured. Please add GOOGLE_GENERATIVE_AI_API_KEY to your environment.";
   }
 

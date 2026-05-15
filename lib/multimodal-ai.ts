@@ -1,5 +1,5 @@
 import { Part } from "@google/generative-ai";
-import { genAI, handleGeminiError } from "./gemini-handler";
+import { genAI, handleGeminiError, hasApiKey } from "./gemini-handler";
 import { CompanyFinancials } from "./types";
 
 export interface MultimodalAnalysisResult {
@@ -15,7 +15,7 @@ export async function analyzeMultimodalMedia(
   fileName: string
 ): Promise<MultimodalAnalysisResult> {
   console.log(`[AI Multimodal] Starting analysis for ${fileName}...`);
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  if (!hasApiKey()) {
     console.error("[AI Multimodal] ERROR: GOOGLE_GENERATIVE_AI_API_KEY is not set!");
     return {
       isBusiness: false,
