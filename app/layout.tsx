@@ -37,6 +37,7 @@ export const viewport: Viewport = {
 
 import { AuthProvider } from "@/lib/auth-context";
 import { PageAnimatePresence } from "@/components/page-animate-presence";
+import { LabFinAssistant } from "@/components/labfin-assistant";
 
 export default function RootLayout({
   children,
@@ -50,6 +51,7 @@ export default function RootLayout({
           <PageAnimatePresence>
             {children}
           </PageAnimatePresence>
+          <LabFinAssistant />
         </AuthProvider>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </body>
