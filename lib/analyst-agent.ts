@@ -1,7 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { genAI, handleGeminiError, isGeminiBlocked } from "./gemini-handler";
 import type { FullAnalysis } from "./types";
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
 
 export interface NewsletterReport {
   title: string;
@@ -62,14 +60,28 @@ export async function generateNewsletter(a: FullAnalysis): Promise<NewsletterRep
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     return JSON.parse(jsonMatch ? jsonMatch[0] : text);
   } catch (error) {
-    console.error("Newsletter Generation Error:", error);
+    if (isGeminiBlocked(error)) {
+      return {
+        title: `${t} Market Snapshot`,
+        headline: "Analysis generated via local rules engine",
+        marketSentiment: "neutral",
+        keyTakeaways: [
+          `Revenue: $$ ${financials.income_statement.revenue.toLocaleString()} $$`,
+          `Net Margin: $$ ${ratios.net_profit_margin.toFixed(2)}% $$`,
+          "Local health assessment indicates stable performance."
+        ],
+        globalContext: "Macro-economic indicators processed via local fallback engine.",
+        sourceReference: "FinLab AI Local Engine"
+      };
+    }
+    const errorMsg = handleGeminiError(error, "Newsletter Generation");
     return {
-      title: `${t} Quick Update`,
-      headline: "Analysis Complete",
+      title: `${t} Update (API Issue)`,
+      headline: errorMsg,
       marketSentiment: "neutral",
-      keyTakeaways: ["Data processed successfully", "Awaiting deeper market signals"],
-      globalContext: "Macro-economic indicators remain stable.",
-      sourceReference: "FinLab AI Default Engine"
+      keyTakeaways: ["API connection issue detected", "Please check your configuration"],
+      globalContext: "System is currently unable to fetch deep market insights.",
+      sourceReference: "FinLab AI Diagnostic Mode"
     };
   }
 }
@@ -138,7 +150,9 @@ export async function analystReply(question: string, a: FullAnalysis): Promise<s
     const response = await result.response;
     return response.text();
   } catch (error) {
-    console.error("Analyst Agent Error:", error);
-    return "I'm having trouble analyzing the data right now. Please try again in a moment.";
+    if (isGeminiBlocked(error)) {
+      return `The LabFin Local Analyst is active. Based on current data for ${t}, the Health Score is $$ ${insights.healthRating}/10 $$ with a verdict of **${decision.verdict}**. ${insights.recommendation}`;
+    }
+    return handleGeminiError(error, "Analyst Agent");
   }
 }

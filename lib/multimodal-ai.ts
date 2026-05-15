@@ -1,7 +1,6 @@
-import { GoogleGenerativeAI, Part } from "@google/generative-ai";
+import { Part } from "@google/generative-ai";
+import { genAI, handleGeminiError } from "./gemini-handler";
 import { CompanyFinancials } from "./types";
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY || "");
 
 export interface MultimodalAnalysisResult {
   isBusiness: boolean;
@@ -110,11 +109,11 @@ export async function analyzeMultimodalMedia(
       };
     }
   } catch (error) {
-    console.error("Multimodal analysis error:", error);
+    const errorMsg = handleGeminiError(error, "Multimodal Media Analysis");
     return {
       isBusiness: false,
-      summary: "",
-      error: error instanceof Error ? error.message : "Unknown AI error",
+      summary: "AI Analysis Failed",
+      error: errorMsg,
     };
   }
 }
