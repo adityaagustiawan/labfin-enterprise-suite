@@ -5,16 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Send, 
   Bot, 
-  Zap, 
   DollarSign, 
   X, 
   Maximize2, 
-  Minimize2
+  Minimize2,
+  RefreshCw
 } from 'lucide-react';
+
+import { runMultiAgentAnalysis, MultiAgentResult } from '@/lib/multi-agent-engine';
 
 interface AssistantMessage {
   role: 'user' | 'assistant';
   content: string;
+  multiAgentData?: MultiAgentResult;
   data?: {
     price: string;
     pe: string;
@@ -33,6 +36,7 @@ export function LabFinAssistant() {
   ]);
   const [input, setInput] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [agentStep, setAgentStep] = useState('');
   const [marketTicker, setMarketTicker] = useState({ symbol: 'GLOBAL_INDEX', price: 4250.20, change: +1.2 });
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -56,20 +60,45 @@ export function LabFinAssistant() {
 
   const analyzeMarket = async (ticker: string) => {
     setIsAnalyzing(true);
+    setAgentStep('Orchestrating Agents...');
     
-    // Simulation of Advanced Quantitative Analysis
-    const mockPrice = (Math.random() * 1000).toFixed(2);
-    const peRatio = (Math.random() * 25 + 15).toFixed(2);
-    
-    setTimeout(() => {
+    const steps = [
+      'MarketDataAgent: Fetching Yahoo Finance feeds...',
+      'SentimentAgent: Scanning global news & social...',
+      'RiskAgent: Evaluating solvency red flags...',
+      'Orchestrator: Consolidating final verdict...'
+    ];
+
+    let currentStep = 0;
+    const stepInterval = setInterval(() => {
+      if (currentStep < steps.length) {
+        setAgentStep(steps[currentStep]);
+        currentStep++;
+      }
+    }, 8000);
+
+    try {
+      const result = await runMultiAgentAnalysis(ticker);
+      clearInterval(stepInterval);
+      
       const response: AssistantMessage = {
         role: 'assistant',
-        content: `Analysis for **${ticker.toUpperCase()}**: Current Valuation is at $$ \$${mockPrice} $$. The P/E Ratio is calculated at $$ ${peRatio} $$. Market sentiment is currently bullish with a volatility coefficient of $$ \sigma = 0.14 $$.`,
-        data: { price: mockPrice, pe: peRatio }
+        content: result.orchestratorSummary,
+        multiAgentData: result
       };
+      
       setMessages(prev => [...prev, response]);
+    } catch (error) {
+      clearInterval(stepInterval);
+      console.error("Multi-Agent Analysis Error:", error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "The multi-agent engine encountered an error while fetching real-time market data. Please try again." 
+      }]);
+    } finally {
       setIsAnalyzing(false);
-    }, 1200);
+      setAgentStep('');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -167,6 +196,35 @@ export function LabFinAssistant() {
                       : 'bg-slate-900 border border-slate-800 text-slate-300 rounded-bl-none'
                   }`}>
                     <p className="text-xs leading-relaxed whitespace-pre-wrap">{m.content}</p>
+                    
+                    {m.multiAgentData && (
+                      <div className="mt-4 space-y-3">
+                        {m.multiAgentData.agentResponses.map((agent, idx) => (
+                          <div key={idx} className="bg-black/20 rounded-xl p-3 border border-white/5">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[9px] font-bold text-sky-400 uppercase tracking-wider">{agent.agentName}</span>
+                              <span className="text-[8px] text-slate-500 italic">{agent.role}</span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 leading-normal">{agent.content}</p>
+                            {agent.data && (
+                              <div className="mt-2 flex gap-2">
+                                {Object.entries(agent.data).map(([k, v]) => (
+                                  <div key={k} className="bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">
+                                    <span className="text-[8px] text-sky-500 uppercase font-bold mr-1">{k}:</span>
+                                    <span className="text-[9px] text-sky-200 font-mono">{String(v)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        <div className="pt-2 border-t border-white/10 mt-2">
+                          <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest mb-1">Final Verdict</p>
+                          <p className="text-xs text-slate-200 font-medium italic">&quot;{m.multiAgentData.finalVerdict}&quot;</p>
+                        </div>
+                      </div>
+                    )}
+
                     {m.data && (
                       <div className="mt-3 grid grid-cols-2 gap-2">
                         <div className="bg-black/40 p-2 rounded border border-white/5 text-center">
@@ -183,9 +241,19 @@ export function LabFinAssistant() {
                 </motion.div>
               ))}
               {isAnalyzing && (
-                <div className="flex items-center gap-3 text-sky-400 font-mono text-[10px] animate-pulse">
-                  <Zap size={12} />
-                  RUNNING MONTE CARLO SIMULATIONS...
+                <div className="flex flex-col gap-2 p-3 bg-sky-500/5 border border-sky-500/10 rounded-xl animate-pulse">
+                  <div className="flex items-center gap-3 text-sky-400 font-mono text-[10px]">
+                    <RefreshCw size={12} className="animate-spin" />
+                    {agentStep}
+                  </div>
+                  <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 30, ease: "linear" }}
+                      className="h-full bg-sky-500"
+                    />
+                  </div>
                 </div>
               )}
               <div ref={scrollRef} />
