@@ -1,9 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react'; 
-import { Terminal, Activity, ShieldAlert, Bot, X, Maximize2, Minimize2 } from 'lucide-react'; 
+import { Terminal, Activity, ShieldAlert, Bot, X, Maximize2, Minimize2, DollarSign, TrendingUp, BarChart3, Wallet } from 'lucide-react'; 
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { DEMO_TICKERS } from '@/lib/demo-tickers';
+
+const FINANCE_LOGOS = [
+  { icon: Bot, name: 'AI' },
+  { icon: DollarSign, name: 'Dollar' },
+  { icon: TrendingUp, name: 'Trends' },
+  { icon: BarChart3, name: 'Chart' },
+  { icon: Wallet, name: 'Finance' }
+];
 
 /** 
  * LABFIN STANDALONE AGENT (No-API Version) 
@@ -22,11 +30,19 @@ const LabFinStandaloneAgent = () => {
   const [isFull, setIsFull] = useState(false);
   const dragControls = useDragControls();
   const [status, setStatus] = useState<'IDLE' | 'ANALYZING' | 'EXECUTING'>('IDLE'); 
+  const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
   const [logs, setLogs] = useState<LogEntry[]>([ 
     { id: 1, text: "SYSTEM RESTORED. Local Intelligence Mode active due to Cloud API restriction.", type: 'sys', time: new Date().toLocaleTimeString() } 
   ]); 
   const [input, setInput] = useState(''); 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentLogoIndex((prev) => (prev + 1) % FINANCE_LOGOS.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -125,24 +141,38 @@ const LabFinStandaloneAgent = () => {
     setInput(''); 
   }; 
 
+  const CurrentLogo = FINANCE_LOGOS[currentLogoIndex].icon;
+
   return ( 
     <div className="fixed inset-0 pointer-events-none z-[60]">
       {/* Floating Bubble */}
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {!isOpen && (
           <motion.button
+            key="bubble"
             drag
             dragMomentum={false}
             whileDrag={{ scale: 1.1, cursor: 'grabbing' }}
-            initial={{ scale: 0, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0, opacity: 0, y: 20 }}
+            initial={{ scale: 0, opacity: 0, y: 50, rotate: -180 }}
+            animate={{ scale: 1, opacity: 1, y: 0, rotate: 0 }}
+            exit={{ scale: 0, opacity: 0, y: 50, rotate: 180 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
             onClick={() => setIsOpen(true)}
             className="pointer-events-auto absolute bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-slate-800 to-black text-blue-400 border border-slate-700 shadow-2xl cursor-grab"
           >
-            <Bot size={28} />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentLogoIndex}
+                initial={{ opacity: 0, rotateY: 90 }}
+                animate={{ opacity: 1, rotateY: 0 }}
+                exit={{ opacity: 0, rotateY: -90 }}
+                transition={{ duration: 0.5 }}
+              >
+                <CurrentLogo size={28} />
+              </motion.div>
+            </AnimatePresence>
             <motion.div
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -159,9 +189,10 @@ const LabFinStandaloneAgent = () => {
             dragControls={dragControls}
             dragListener={false}
             dragMomentum={false}
-            initial={isFull ? { opacity: 0 } : { opacity: 0, scale: 0.9, y: 20, x: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20, x: 20 }}
+            initial={isFull ? { opacity: 0 } : { opacity: 0, scale: 0.5, y: 100, x: 100, rotateX: 45 }}
+            animate={{ opacity: 1, scale: 1, y: 0, x: 0, rotateX: 0 }}
+            exit={{ opacity: 0, scale: 0.5, y: 100, x: 100, rotateX: 45 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={`pointer-events-auto absolute z-[70] flex flex-col bg-black border border-slate-800 overflow-hidden font-mono shadow-2xl transition-all duration-300 ease-out
               ${isFull 
                 ? 'inset-0 rounded-0' 
@@ -179,7 +210,10 @@ const LabFinStandaloneAgent = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500"></div> 
               </div> 
               <div className="flex items-center gap-3">
-                <span className="text-[10px] text-slate-500 tracking-widest uppercase font-bold">LABFIN_LOCAL_CORE_v2.6</span> 
+                <div className="flex items-center gap-2 mr-1">
+                  <CurrentLogo size={14} className="text-blue-400 animate-pulse" />
+                  <span className="text-[10px] text-slate-500 tracking-widest uppercase font-bold">LABFIN_LOCAL_CORE_v2.6</span> 
+                </div>
                 <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                   <span className="text-[9px] text-emerald-400 font-bold tracking-tighter">ONLINE</span>
