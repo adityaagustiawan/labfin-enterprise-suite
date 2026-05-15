@@ -12,7 +12,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-import { runMultiAgentAnalysis, MultiAgentResult } from '@/lib/multi-agent-engine';
+import { MultiAgentResult } from '@/lib/multi-agent-engine';
 
 interface AssistantMessage {
   role: 'user' | 'assistant';
@@ -78,7 +78,37 @@ export function LabFinAssistant() {
     }, 8000);
 
     try {
-      const result = await runMultiAgentAnalysis(ticker);
+      console.log(`[Assistant] Dispatching analysis for ticker: ${ticker}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+
+      // Call the NEW API route instead of direct library call
+      const res = await fetch('/api/analyze/multi-agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+      console.log(`[Assistant] API Response status: ${res.status}`);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`[Assistant] API Error Text:`, errText);
+        let errorMsg = "Failed to fetch AI analysis";
+        try {
+          const errData = JSON.parse(errText);
+          errorMsg = errData.error || errorMsg;
+        } catch (e) {
+          // not json
+        }
+        throw new Error(errorMsg);
+      }
+
+      const result: MultiAgentResult = await res.json();
+      console.log(`[Assistant] Analysis successful:`, result.orchestratorSummary.substring(0, 50) + "...");
       clearInterval(stepInterval);
       
       const response: AssistantMessage = {

@@ -19,7 +19,7 @@ export interface MultiAgentResult {
  * MULTI-AGENT ANALYTICS ENGINE
  * Orchestrates multiple specialized agents to provide a comprehensive market view.
  */
-export async function runMultiAgentAnalysis(query: string, contextData?: Record<string, unknown>): Promise<MultiAgentResult> {
+export async function runMultiAgentAnalysis(query: string, contextData?: Record<string, unknown> | null): Promise<MultiAgentResult> {
   if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     throw new Error("Gemini API Key missing");
   }
@@ -32,16 +32,19 @@ export async function runMultiAgentAnalysis(query: string, contextData?: Record<
       Your task is to analyze the user's query by coordinating three specialized virtual agents.
       
       USER QUERY: "${query}"
-      CURRENT CONTEXT: ${JSON.stringify(contextData || "No specific company loaded")}
+      
+      REAL-TIME MARKET DATA (Context):
+      ${contextData ? JSON.stringify(contextData, null, 2) : "No real-time data found for this ticker. Use your internal knowledge."}
       
       AGENTS TO SIMULATE:
-      1. **MarketDataAgent**: Focused on real-time prices, Yahoo Finance trends, and ticker-specific movements.
-      2. **SentimentAgent**: Focused on news, social sentiment, and global market mood.
-      3. **RiskAgent**: Focused on financial health, debt ratios, and solvency "red flags".
+      1. **MarketDataAgent**: Analyze the REAL-TIME MARKET DATA provided. Mention specific prices, volume, and daily ranges.
+      2. **SentimentAgent**: Analyze the global sentiment for this asset based on the provided context and news.
+      3. **RiskAgent**: Identify potential risks based on the financial metrics (P/E, market cap, 52-week highs/lows) in the context.
       
       INSTRUCTIONS:
-      - Each agent must provide its specific perspective based on the query.
-      - If the query mentions a ticker (e.g., AAPL, TSLA), the agents should act as if they just fetched real-time data from global markets.
+      - Use the REAL-TIME MARKET DATA to ground your responses.
+      - If data is provided, use the actual price and change % in the MarketDataAgent response.
+      - Each agent must provide its specific perspective.
       - The Orchestrator should summarize the findings and give a final "LabFin Verdict".
       
       OUTPUT FORMAT (Strict JSON):
@@ -59,9 +62,16 @@ export async function runMultiAgentAnalysis(query: string, contextData?: Record<
     const result = await model.generateContent(systemPrompt);
     const response = await result.response;
     const text = response.text();
+    console.log(`[Multi-Agent Engine] Raw AI Response:`, text.substring(0, 100) + "...");
     
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text) as MultiAgentResult;
+    if (!jsonMatch) {
+      console.error(`[Multi-Agent Engine] FAILED to find JSON in response:`, text);
+      throw new Error("Invalid AI response format (no JSON found)");
+    }
+    
+    const parsed = JSON.parse(jsonMatch[0]) as MultiAgentResult;
+    console.log(`[Multi-Agent Engine] Successfully parsed agents:`, parsed.agentResponses.length);
     
     return parsed;
   } catch (error) {
