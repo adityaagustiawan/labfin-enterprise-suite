@@ -61,13 +61,27 @@ export async function runMultiAgentAnalysis(query: string, contextData?: Record<
 
     const result = await model.generateContent(systemPrompt);
     const response = await result.response;
+    
+    // Check if the response was blocked
+    if (response.candidates?.[0]?.finishReason === "SAFETY" || response.candidates?.[0]?.finishReason === "OTHER") {
+      console.error(`[Multi-Agent Engine] Response blocked by Gemini safety filters or other reason:`, response.candidates[0].finishReason);
+      throw new Error(`AI response was restricted (Reason: ${response.candidates[0].finishReason})`);
+    }
+
     const text = response.text();
     console.log(`[Multi-Agent Engine] Raw AI Response:`, text.substring(0, 100) + "...");
     
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error(`[Multi-Agent Engine] FAILED to find JSON in response:`, text);
-      throw new Error("Invalid AI response format (no JSON found)");
+      // Fallback to a plain text summary if JSON fails
+      return {
+        orchestratorSummary: text,
+        agentResponses: [
+          { agentName: "System", role: "AI Assistant", content: "I was unable to format the multi-agent data properly, but here is my analysis." }
+        ],
+        finalVerdict: "Analysis partially completed."
+      };
     }
     
     const parsed = JSON.parse(jsonMatch[0]) as MultiAgentResult;
@@ -75,9 +89,10 @@ export async function runMultiAgentAnalysis(query: string, contextData?: Record<
     
     return parsed;
   } catch (error) {
-    console.error("Multi-Agent Engine Error:", error);
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    console.error("[Multi-Agent Engine] COORDINATION ERROR:", errorMsg);
     return {
-      orchestratorSummary: "I encountered an error coordinating the agents.",
+      orchestratorSummary: `Agent Coordination Failure: ${errorMsg}. Please verify your API configuration.`,
       agentResponses: [],
       finalVerdict: "System Offline"
     };
