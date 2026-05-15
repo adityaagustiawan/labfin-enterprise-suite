@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loadDemoTicker } from "@/lib/demo-tickers";
+import LabFinStandaloneAgent from "@/components/labfin-standalone-agent";
 
 function cagr(start: number, end: number, years: number) {
   if (start <= 0 || years <= 0) return null;
@@ -61,6 +62,9 @@ export default async function ForecastPage({ params }: { params: Promise<{ ticke
         >
           ← Back to company
         </Link>
+      </div>
+      <div className="mt-12 border-t border-zinc-800 pt-12">
+        <LabFinStandaloneAgent />
       </div>
     </div>
   );

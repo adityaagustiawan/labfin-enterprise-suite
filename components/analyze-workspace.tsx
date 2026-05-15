@@ -14,6 +14,7 @@ import type {
 
 import { NewsletterPanel } from "./newsletter-panel";
 import { generateNewsletter, NewsletterReport } from "@/lib/analyst-agent";
+import LabFinStandaloneAgent from "./labfin-standalone-agent";
 
 type Tab = "manual" | "ticker" | "compare" | "ai";
 
@@ -748,6 +749,10 @@ export default function AnalyzeWorkspace() {
           <AnalysisDashboard analysis={analysis} showAnalystChat />
         </div>
       )}
+
+      <div className="mt-12 border-t border-zinc-800 pt-12">
+        <LabFinStandaloneAgent />
+      </div>
     </>
   );
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AnalysisDashboard } from "@/components/analysis-dashboard";
 import { loadDemoTicker } from "@/lib/demo-tickers";
 import { isInWatchlist, toggleWatchlist } from "@/lib/watchlist-storage";
+import LabFinStandaloneAgent from "./labfin-standalone-agent";
 import type { FullAnalysis } from "@/lib/types";
 
 export default function CompanyDetailClient({ ticker }: { ticker: string }) {
@@ -168,6 +169,9 @@ export default function CompanyDetailClient({ ticker }: { ticker: string }) {
           </section>
 
           <AnalysisDashboard analysis={analysis} showAnalystChat showTrendCharts omitHeader />
+          <div className="mt-12 border-t border-zinc-800 pt-12">
+            <LabFinStandaloneAgent />
+          </div>
         </>
       )}
     </div>

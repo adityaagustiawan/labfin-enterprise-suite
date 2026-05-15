@@ -37,7 +37,6 @@ export const viewport: Viewport = {
 
 import { AuthProvider } from "@/lib/auth-context";
 import { PageAnimatePresence } from "@/components/page-animate-presence";
-import LabFinStandaloneAgent from "@/components/labfin-standalone-agent";
 import 'katex/dist/katex.min.css';
 
 export default function RootLayout({
@@ -52,7 +51,6 @@ export default function RootLayout({
           <PageAnimatePresence>
             {children}
           </PageAnimatePresence>
-          <LabFinStandaloneAgent />
         </AuthProvider>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
       </body>
